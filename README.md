@@ -37,7 +37,7 @@ N.B.: With the bonus challenge you can earn an extra 5 points in subject.
 
 ### Literature and additional materials
 
-1. Background behind Jacobi method for temperature distribution, prepared by prof. Uroš Lotrič and Davor Sluga -> [link](https://unilj-my.sharepoint.com/:b:/g/personal/ratko_pilipovic_fri1_uni-lj_si/ERB4VYXHr9ZKkuIuswINA1ABxN_BZ3Y0vGTBXiDj8q5Isw?e=lorMtk) 
+1. Background behind Jacobi method for temperature distribution, prepared by prof. Uroš Lotrič and Davor Sluga -> [link](https://unilj-my.sharepoint.com/:b:/g/personal/ratko_pilipovic_fri1_uni-lj_si/ERB4VYXHr9ZKkuIuswINA1ABxN_BZ3Y0vGTBXiDj8q5Isw?e=CZeSOt) 
 
 2. Velten, Markus, Robert Schöne, Thomas Ilsche, and Daniel Hackenberg. "Memory performance of AMD EPYC Rome and Intel Cascade Lake SP server processors." In Proceedings of the 2022 ACM/SPEC on International Conference on Performance Engineering, pp. 165-175. 2022.
 
