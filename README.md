@@ -14,7 +14,7 @@ In this homework assignment, you will employ the Jacobi iterative method as a be
 
 In the repository, you will find the serial implementation of the Jacobi method for temperature distribution (jacobi_serial.c). Using serial implementation, adapt the program for multicore execution using the OpenMP library. 
 
-### Evaluating the effects thread pining using likwid tool 
+### Evaluating the effects thread of pining using likwid tool 
 
 Utilizing the likwid tool (likwid-perfctr), analyze the performance of multithreaded applications across various hardware thread (hart) [configurations](https://unilj-my.sharepoint.com/:b:/g/personal/ratko_pilipovic_fri1_uni-lj_si/Ealzuf9Md65Aik01SDeJ-GsBLB1EHg2gj9-loZDVK_2qfA?e=XiyqPw):
 
@@ -42,6 +42,6 @@ N.B.: With the bonus challenge you can earn an extra 5 points in subject.
 2. Velten, Markus, Robert Schöne, Thomas Ilsche, and Daniel Hackenberg. "Memory performance of AMD EPYC Rome and Intel Cascade Lake SP server processors." In Proceedings of the 2022 ACM/SPEC on International Conference on Performance Engineering, pp. 165-175. 2022.
 
 ### Analysis and Reporting:
-Describe your results in a report (two-page max).
+Describe your results in a report (two page max).
 
 
