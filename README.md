@@ -5,9 +5,9 @@
 
 In this assignment, you will analyze the performance of a snooping-based cache coherence protocol in a multiprocessor system. The snooping protocol is a widely used mechanism for maintaining cache coherence, allowing multiple processors to have a consistent view of memory by monitoring (or "snooping") the bus for memory transactions. You will specifically assess the performance of Cholesky decomposition in a multiprocessor system utilizing this snooping-based cache coherence protocol. Cholesky decomposition is a numerical method used to factor a symmetric positive-definite matrix into the product of a lower triangular matrix and its conjugate transpose.
 
-To evaluate the performance of the snooping-based cache coherence protocol, you will use the Cholesky decomposition implementation provided in the `workload/cholesky/` directory. This implementation is designed to run on a multiprocessor system with a shared memory architecture and employs OpenMP for parallelization. For the GEM5 model, you will utilize the Python scripts located in the `smp_classic/` directory to model the multiprocessor system with a snooping-based cache coherence protocol. The script `smp_benchmark/smp_benchmark.py` contains the implementation of this protocol and is based on the M5 memory system in GEM5.
+To evaluate the performance of the snooping-based cache coherence protocol, you will use the Cholesky decomposition implementation provided in the `workload/cholesky/` directory. For the GEM5 model, you will utilize the Python scripts located in the `smp_classic/` directory to model the multiprocessor system with a snooping-based cache coherence protocol. The script `smp_benchmark/smp_benchmark.py` contains the implementation of this protocol and is based on the M5 memory system in GEM5.
 
-1. Set the number of processors to 2, 4, 8, and 16.
+1. Assess performance for a number of processors: 2, 4, 8, and 16.
 2. Run the Cholesky decomposition program for each configuration.
 3. Measure the following metrics connected to performance:
    - CPI (Cycles Per Instruction)
@@ -38,14 +38,11 @@ To evaluate the performance of the snooping-based cache coherence protocol, you 
   - L1 cache: 32KB, 4-way set associative, 64B cache line size
   - L2 cache: 256KB, 8-way set associative, 64B cache line size
   - Number of L2 cache banks: 1
-
-### Bonus assignment (3 points)
-
-For additional points, optimize the Cholesky decomposition implementation to improve its performance. The goal is to reduce the traffic on the bus and improve the overall execution time. Compare the performance of your optimized version with the original implementation. 
+ 
 
 ## Assessing the impact of false sharing on performance in directory based cache coherence protocols (4 points)
 
-In the directory-based cache coherence protocol, false sharing can arise when multiple processors access different data items stored in the same cache line. This situation can lead to unnecessary invalidations and increased memory traffic, ultimately degrading performance. Your task is to analyze the impact of false sharing on the performance of a directory-based cache coherence protocol. For this analysis, you will use the multithreaded version of a program that computes the value of pi through [integration](https://arielortiz.info/apps/s201911/tc2006/notes_computing_pi/). Both program versions—one with false sharing and one without—are available in the `workload/pi/` directory. 
+False sharing can arise when multiple processors access different data items stored in the same cache line. This situation can lead to unnecessary invalidations and increased memory traffic, ultimately degrading performance. Your task is to analyze the impact of false sharing on the performance of a directory-based cache coherence protocol. For this analysis, you will use the multithreaded version of a program that computes the value of pi through [integration](https://arielortiz.info/apps/s201911/tc2006/notes_computing_pi/). Both program versions—one with false sharing and one without—are available in the `workload/pi/` directory. 
 
 To evaluate the impact of false sharing, you must run both program versions on a simulated system that utilizes a directory-based cache coherence protocol, specifically using the gem5 simulator. The Python scripts that model the SMP system with gem5 can be found in the `smp_ruby/` directory. You will assess the system's performance by varying the number of processors and observing the effects on execution time and memory traffic. Additionally, you should analyze the cache coherence protocol's behavior in relation to invalidations and memory accesses.
 
@@ -74,7 +71,7 @@ In NUMA (Non-Uniform Memory Access) systems, the interconnection network plays a
 
 You will utilize the gem5 simulator to model this multiprocessor system. To evaluate performance, the STREAM benchmark will be employed. The [STREAM benchmark](https://www.amd.com/en/developer/zen-software-studio/applications/spack/stream-benchmark.html) is a parallel program specifically designed to stress the memory subsystem and the interconnection network by performing a series of computations on large arrays of data.
 
-For this assignment, you will implement one kernel from the STREAM benchmark that executes the DAXPY operation on two arrays. The DAXPY operation, a common vector operation in scientific computing, is defined as follows:
+For this assignment, we implemented one kernel from the STREAM benchmark that executes the DAXPY operation on two arrays. The DAXPY operation, a common vector operation in scientific computing, is defined as follows:
 
 ```
 y[i] = a * x[i] + y[i]
