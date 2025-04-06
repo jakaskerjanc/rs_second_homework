@@ -12,75 +12,49 @@ from gem5.simulate.exit_event import ExitEvent
 from gem5.simulate.simulator import Simulator
 from gem5.resources.resource import CustomResource
 from gem5.components.memory.single_channel import SingleChannelDDR3_1600
-from gem5.simulate.exit_event import ExitEvent
 
-
-
-from three_level import PrivateL1PrivateL2SharedL3CacheHierarchy
+from mesi_two_level import MESITwoLevelCacheHierarchy
 
 import m5
+
 import argparse
+
 
 parser = argparse.ArgumentParser(description="Configure simulation parameters.")
 parser.add_argument("--num_cores", type=int, default=4, help="Number of CPU cores.")
 parser.add_argument("--l1_size", type=str, default="32KiB", help="L1 cache size.")
-parser.add_argument("--l2_size", type=str, default="512KiB", help="L2 cache size.")
-parser.add_argument("--l3_size", type=str, default="2MiB", help="L3 cache size.")
+parser.add_argument("--l2_size", type=str, default="256KiB", help="L2 cache size.")
 
 args = parser.parse_args()
 
-
-cache_hiearchy = PrivateL1PrivateL2SharedL3CacheHierarchy(
+cache_hiearchy = MESITwoLevelCacheHierarchy(
     l1d_size=args.l1_size,
     l1d_assoc=8,
     l1i_size=args.l1_size,
     l1i_assoc=8,
     l2_size=args.l2_size,
     l2_assoc=8,
-    l3_size=args.l3_size,
-    l3_assoc=16,
+    num_l2_banks=1,
 )
 
 processor = SimpleProcessor(
-        cpu_type=CPUTypes.MINOR,
-        num_cores=args.num_cores,
-        isa=ISA.X86,
-    )
+    cpu_type=CPUTypes.MINOR,
+    num_cores=args.num_cores,
+    isa=ISA.X86,
+)
 
-
-memory = SingleChannelDDR3_1600(size="4GiB")
-
-
-def roi_begin_handler():
-    m5.stats.reset()  
-
-def roi_end_handler():
-    m5.stats.dump()  
-    print("stats have been dumped!")
-
-
-
+memory = SingleChannelDDR3_1600(size="2GiB")
 
 #add board 
 board = SimpleBoard(
     clk_freq="3GHz",
     processor=processor,
     memory=memory,
-    cache_hierarchy=cache_hiearchy
-      
+    cache_hierarchy=cache_hiearchy,
 )
 
-#binary = CustomResource("./workload/variables/mat_vec_mult.bin")
-#binary = CustomResource("../workload/cholesky/cholesky.bin")
-binary = CustomResource("../workload/lu_decomp/lu_decomp_opt.bin")
-
+binary = CustomResource("../workload/pi/pi_optimized.bin")
 board.set_se_binary_workload(binary)
 
-simulator = Simulator(
-            board=board,
-            on_exit_event={
-                ExitEvent.WORKBEGIN : roi_begin_handler,
-                ExitEvent.WORKEND : roi_end_handler,
-            }     
-            )
+simulator = Simulator(board=board)
 simulator.run()

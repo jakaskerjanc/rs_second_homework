@@ -1,12 +1,15 @@
-CC = gcc
-CFLAGS = -fopenmp -O2 -Wall
-LDFLAGS = -lm
-TARGET = main.bin
+GEM5_PATH = /d/hpc/projects/FRI/GEM5/gem5_workspace/gem5/
+ISA = x86
+GXX = gcc
 
-all: $(TARGET)
+TARGET = cholesky
+SRC = $(TARGET).c
+BIN = $(TARGET).bin
 
-$(TARGET): main.c
-	$(CC) $(CFLAGS) -o $(TARGET) main.c $(LDFLAGS)
+all: $(BIN)
+
+$(BIN): $(SRC)
+	$(GXX) -o $(BIN) $(SRC) -O2 -lm -fopenmp -lpthread -I$(GEM5_PATH)/include -L$(GEM5_PATH)/util/m5/build/$(ISA)/out -I$(GEM5_PATH)/util/m5/src -lm5 -DGEM5
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(BIN)

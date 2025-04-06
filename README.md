@@ -1,47 +1,105 @@
 # Second homework assignment
 
 
-## Employing Jacobi method for temperature distribution 
+## Assessing performance of a snooping based cache coherence protocol (3 points)
 
-The Jacobi iterative method is a fundamental numerical technique for solving linear equation systems in an iterative fashion. This method operates by iteratively updating the values of unknowns in a system based on the values of neighboring variables, gradually refining the solution until a specified level of accuracy is achieved. In each iteration, the method computes the new values for each variable by averaging the values of its neighbors from the previous iteration. For this homework task, our objective is to employ the Jacobi method for the temperature distribution in a two-dimensional rectangular problem. We have defined the boundary conditions and computed the temperature distribution across various sizes of the problem domain. 
+In this assignment, you will analyze the performance of a snooping-based cache coherence protocol in a multiprocessor system. The snooping protocol is a widely used mechanism for maintaining cache coherence, allowing multiple processors to have a consistent view of memory by monitoring (or "snooping") the bus for memory transactions. You will specifically assess the performance of Cholesky decomposition in a multiprocessor system utilizing this snooping-based cache coherence protocol. Cholesky decomposition is a numerical method used to factor a symmetric positive-definite matrix into the product of a lower triangular matrix and its conjugate transpose.
 
-### Homework assignment 
+To evaluate the performance of the snooping-based cache coherence protocol, you will use the Cholesky decomposition implementation provided in the `workload/cholesky/` directory. This implementation is designed to run on a multiprocessor system with a shared memory architecture and employs OpenMP for parallelization. For the GEM5 model, you will utilize the Python scripts located in the `smp_classic/` directory to model the multiprocessor system with a snooping-based cache coherence protocol. The script `smp_benchmark/smp_benchmark.py` contains the implementation of this protocol and is based on the M5 memory system in GEM5.
 
-In this homework assignment, you will employ the Jacobi iterative method as a benchmark to assess the efficiency of multithreaded programs, with a particular emphasis on the effects of thread pinning to hardware cores and the complexities of Non-Uniform Memory Access (NUMA) architectures. Initially, you'll investigate the performance impacts of thread pinning using the likwid tool. Additionally, you'll delve into the trade-offs between thread pinning and NUMA-aware memory allocation to uncover the constraints and opportunities associated with speeding up programs with multicore systems.
+1. Set the number of processors to 2, 4, 8, and 16.
+2. Run the Cholesky decomposition program for each configuration.
+3. Measure the following metrics connected to performance:
+   - CPI (Cycles Per Instruction)
+   - L1 cache miss ratio per core (`l1d_cache.overallMisses::total`, `l1d_cache.overallHits::total`)
+   - Number of upgrade requests at L3 cache (`l3_bus.transDist::UpgradeReq`)
+   - Snoop traffic (`l3_bus.snoopTraffic`)
 
 
-### Parallelize program 
+- Parameters of cache hierarchy:
+   - L1 cache: 32KB, 8-way set associative, 64B cache line size
+   - L2 cache: 256KB, 8-way set associative, 64B cache line size 
+   - L1 and L2 cache are private to each core
+   - L3 cache: 2MB, 16-way set associative, 64B cache line size
 
-In the repository, you will find the serial implementation of the Jacobi method for temperature distribution (jacobi_serial.c). Using serial implementation, adapt the program for multicore execution using the OpenMP library. 
 
-### Evaluating the effects of thread pining using likwid tool 
+### Experiment Setup:
 
-Utilizing the likwid tool (likwid-perfctr), analyze the performance of multithreaded applications across various hardware thread (hart) [configurations](https://unilj-my.sharepoint.com/:b:/g/personal/ratko_pilipovic_fri1_uni-lj_si/Ealzuf9Md65Aik01SDeJ-GsBLB1EHg2gj9-loZDVK_2qfA?e=XiyqPw):
+1. Set the number of processors to 2, 4, 8, and 16.
+2. Run the program with and without false sharing for each configuration.
+3. To observe the impact of false sharing, observe following metrics:
+   - Execution time
+   - Number of invalidations (`ruby_system.L1Cache_Controller.Inv::total`)
+   - Number of loads under different states (`L1Cache_Controller.I.Load::total`, `L1Cache_Controller.S.Load::total`, `L1Cache_Controller.E.Load::total`, `L1Cache_Controller.M.Load::total`)
+   - Number of read and write requests towards the L2 cache (`L2Cache_Controller.L1_GETS`, `L2Cache_Controller.L1_GETX`)
+   - Network traffic ( `network.msg_count.Request_Control`, `network.msg_count.Response_Data`, `network.msg_count.Writeback_Data`)
 
-1. Evaluate performance with 4 harts belonging to the same CCX.
-2. Assess performance with 4 harts, distributing two threads per two adjacents CCX.
-3. Evaluate performance with 4 harts, distributing two threads within same CCX per two adjacents CCD.
-4. Analyze performance with 4 harts, distributing two threads within same CCX per two non-adjacent CCD.
-5. Evaluate performance with 4 harts, distributing two threads within same CCX per NUMA domain.
-6. Evaluate performance with 4 harts, distributing two threads per two adjacents cores.
+- Parameters of cache hierarchy:
+  - L1 cache: 32KB, 4-way set associative, 64B cache line size
+  - L2 cache: 256KB, 8-way set associative, 64B cache line size
+  - Number of L2 cache banks: 1
 
-During evaluation, monitor NUMA traffic, cache behavior, CPI, FLOPS, and execution time. Provide a detailed explanation of the obtained results in the report.  
+### Bonus assignment (3 points)
 
-### Bonus challenge: Memory binding and NUMA performance 
+For additional points, optimize the Cholesky decomposition implementation to improve its performance. The goal is to reduce the traffic on the bus and improve the overall execution time. Compare the performance of your optimized version with the original implementation. 
 
-In this assignment, you aim to identify the closest CCXs to the data source. Start by binding the temperature matrix to the first NUMA domain, then systematically pin the four hardware threads (harts) to each CCX in succession. For instance, bind all four harts to the first CCX, measure performance, then repeat the process for the second CCX, and so forth. Repeat these experiments when binding the temperature matrix to the second NUMA domain. Represent the results in the form of matrix (NUMA domains vs CCX). To accomplish this, utilize the hwloc library. 
+## Assessing the impact of false sharing on performance in directory based cache coherence protocols (4 points)
 
- **Warning:** Switch -C in likwid-perfctr pins and measures performance of threads. If you want only measure without pinning, use -c switch. (case sensitive!!!)
+In the directory-based cache coherence protocol, false sharing can arise when multiple processors access different data items stored in the same cache line. This situation can lead to unnecessary invalidations and increased memory traffic, ultimately degrading performance. Your task is to analyze the impact of false sharing on the performance of a directory-based cache coherence protocol. For this analysis, you will use the multithreaded version of a program that computes the value of pi through [integration](https://arielortiz.info/apps/s201911/tc2006/notes_computing_pi/). Both program versions—one with false sharing and one without—are available in the `workload/pi/` directory. 
 
-N.B.: With the bonus challenge you can earn an extra 5 points in subject. 
+To evaluate the impact of false sharing, you must run both program versions on a simulated system that utilizes a directory-based cache coherence protocol, specifically using the gem5 simulator. The Python scripts that model the SMP system with gem5 can be found in the `smp_ruby/` directory. You will assess the system's performance by varying the number of processors and observing the effects on execution time and memory traffic. Additionally, you should analyze the cache coherence protocol's behavior in relation to invalidations and memory accesses.
 
-### Literature and additional materials
+### Experiment Setup:
 
-1. Background behind Jacobi method for temperature distribution, inspired by materials by prof. Uroš Lotrič and Davor Sluga -> [link](https://unilj-my.sharepoint.com/:b:/g/personal/ratko_pilipovic_fri1_uni-lj_si/EWfzsfE2cY9Cmqidtx-2kZQBsGCFcLrkz0g_1yYilqFHFg?e=rywfEm) 
+1. Set the number of processors to 2, 4, 8, and 16.
+2. Run the program with and without false sharing for each configuration.
+3. To observe the impact of false sharing, observe following metrics:
+   - CPI (Cycles Per Instruction)
+   - Execution time
+   - Number of invalidations (`ruby_system.L1Cache_Controller.Inv::total`)
+   - Number of loads under different states (`L1Cache_Controller.I.Load::total`, `L1Cache_Controller.S.Load::total`, `L1Cache_Controller.E.Load::total`, `L1Cache_Controller.M.Load::total`)
+   - Number of read and write requests towards the L2 cache (`L2Cache_Controller.L1_GETS`, `L2Cache_Controller.L1_GETX`)
+   - Network traffic ( `network.msg_count.Request_Control`, `network.msg_count.Response_Data`, `network.msg_count.Writeback_Data`)
 
-2. Velten, Markus, Robert Schöne, Thomas Ilsche, and Daniel Hackenberg. "Memory performance of AMD EPYC Rome and Intel Cascade Lake SP server processors." In Proceedings of the 2022 ACM/SPEC on International Conference on Performance Engineering, pp. 165-175. 2022.
+- Parameters of cache hierarchy:
+  - L1 cache: 32KB, 8-way set associative, 64B cache line size
+  - L2 cache: 256KB, 8-way set associative, 64B cache line size
+  - Number of L2 cache banks: 1
+
+
+
+## Assessing the performance of interconnection network (3 points)
+
+In NUMA (Non-Uniform Memory Access) systems, the interconnection network plays a crucial role in the overall performance of the system. In this assignment, you will analyze the performance of a multiprocessor system with three different types of interconnection networks: crossbar-based (or star-based), ring, and simple point-to-point networks.
+
+You will utilize the gem5 simulator to model this multiprocessor system. To evaluate performance, the STREAM benchmark will be employed. The [STREAM benchmark](https://www.amd.com/en/developer/zen-software-studio/applications/spack/stream-benchmark.html) is a parallel program specifically designed to stress the memory subsystem and the interconnection network by performing a series of computations on large arrays of data.
+
+For this assignment, you will implement one kernel from the STREAM benchmark that executes the DAXPY operation on two arrays. The DAXPY operation, a common vector operation in scientific computing, is defined as follows:
+
+```
+y[i] = a * x[i] + y[i]
+```
+
+Here, `a` is a scalar value, while `x` and `y` are arrays of floating-point numbers, and `i` represents the index of the arrays. The DAXPY operation is frequently used to benchmark and evaluate the performance of memory systems.
+
+You can find the implementation of the DAXPY kernel in the folder `workload/stream/`. This implementation is written in C and employs OpenMP to parallelize computations across multiple threads, designed to run on a multiprocessor system with shared memory architecture.
+
+Regarding the GEM5 model, you will use the Python scripts located in the `network/` directory to model the multiprocessor system with different interconnection networks. Specifically, the Python script `network/networks.py` contains the implementations of these various interconnection networks and is based on the Simple Network class, which provides a basic framework for a network interface and network switch. The script includes the following classes:
+
+- **SimplePt2Pt Network**: This class implements a simple point-to-point network, connecting two nodes through a single switch, and provides a straightforward interface for sending and receiving messages.
+- **Circle Network**: This class establishes a ring network that connects multiple nodes in a circular topology, utilizing a series of switches to link the nodes and offering a simple interface for communication.
+- **Crossbar Network**: This class creates a crossbar network, connecting multiple nodes in a star topology. It uses a series of switches to interconnect the nodes and provides an easy-to-use interface for message transmission.
+
+### Experiment Setup:
+1. Set the number of processors to 2, 4, 8, and 16.
+2. Run the DAXPY kernel on each interconnection network (crossbar, ring, and point-to-point) for each configuration.
+3. Measure the following metrics connected to network performance:
+   - Network traffic ( `network.msg_count.Request_Control`, `network.msg_count.Response_Data`, `network.msg_count.Writeback_Data`)
+
+- Parameters of cache hierarchy:
+  - L1 cache: 32KB, 8-way set associative, 64B cache line size
+  - L2 cache: 256KB, 8-way set associative, 64B cache line size
+  - Number of L2 cache banks: 1
 
 ### Analysis and Reporting:
-Describe your results in a report (two page max).
-
-
+Describe your results in a report (three page max).

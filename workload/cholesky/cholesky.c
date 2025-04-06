@@ -3,6 +3,10 @@
 #include <math.h>
 #include <omp.h>
 #include <time.h>
+// Include the gem5 m5ops header file
+#include <gem5/m5ops.h>
+
+
 
 #define N 100  // Matrix size (adjustable)
 
@@ -14,6 +18,7 @@ void print_matrix(double** M) {
         printf("\n");
     }
 }
+
 
 
 
@@ -47,7 +52,7 @@ void cholesky_decomposition(double** A, double** L) {
     int i, j, k;
 
     // Initialize L matrix to zeros
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for collapse(2) schedule(static)
     for (i = 0; i < N; i++)
         for (j = 0; j < N; j++)
             L[i][j] = 0.0;
@@ -57,24 +62,25 @@ void cholesky_decomposition(double** A, double** L) {
         double sum = 0.0;
 
         // Compute diagonal element
-        #pragma omp parallel for reduction(+:sum)
+        #pragma omp parallel for reduction(+:sum) schedule(static)
         for (k = 0; k < i; k++)
             sum += L[i][k] * L[i][k];
         L[i][i] = sqrt(A[i][i] - sum);
 
         // Compute off-diagonal elements
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (j = i + 1; j < N; j++) {
-            sum = 0.0;
+            double local_sum = 0.0;
             for (k = 0; k < i; k++)
-                sum += L[j][k] * L[i][k];
-            L[j][i] = (A[j][i] - sum) / L[i][i];
+                local_sum += L[j][k] * L[i][k];
+            L[j][i] = (A[j][i] - local_sum) / L[i][i];
         }
     }
 }
 
 
 int main() {
+
     // Allocate matrices dynamically
     double** A = (double**)malloc(N * sizeof(double*));
     double** L = (double**)malloc(N * sizeof(double*));
@@ -83,19 +89,33 @@ int main() {
         L[i] = (double*)malloc(N * sizeof(double));
     }
 
+    // get number of threads
+    int num_threads = omp_get_max_threads();
+
+    omp_set_num_threads(num_threads);
+
+    printf("Number of threads: %d\n", num_threads);
     // Generate SPD matrix
     generate_spd_matrix(A);
 
     printf("Generated Symmetric Positive Definite Matrix A:\n");
     
-    printf("Initial Matrix A:\n");
-    print_matrix(A);
+  
 
+
+    #ifdef GEM5
+	// m5_work_begin(work_id, thread_id) -- begin a item sample
+    m5_work_begin(0, 0);
+	#endif
     // Perform Cholesky Decomposition
     cholesky_decomposition(A, L);
+    
+    #ifdef GEM5
+	    m5_work_end(0, 0);
+	#endif
 
-    printf("\nCholesky Decomposed Matrix L:\n");
-    print_matrix(L);
+    //printf("\nCholesky Decomposed Matrix L:\n");
+    //print_matrix(L);
 
     // Free allocated memory
     for (int i = 0; i < N; i++) {
