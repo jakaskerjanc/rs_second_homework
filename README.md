@@ -7,6 +7,8 @@ In this assignment, you will analyze the performance of a snooping-based cache c
 
 To evaluate the performance of the snooping-based cache coherence protocol, you will use the Cholesky decomposition implementation provided in the `workload/cholesky/` directory. For the GEM5 model, you will utilize the Python scripts located in the `smp_classic/` directory to model the multiprocessor system with a snooping-based cache coherence protocol. The script `smp_benchmark/smp_benchmark.py` contains the implementation of this protocol and is based on the M5 memory system in GEM5.
 
+### Experiment Setup:
+
 1. Assess performance for a number of processors: 2, 4, 8, and 16.
 2. Run the Cholesky decomposition program for each configuration.
 3. Measure the following metrics connected to performance:
@@ -22,22 +24,6 @@ To evaluate the performance of the snooping-based cache coherence protocol, you 
    - L1 and L2 cache are private to each core
    - L3 cache: 2MB, 16-way set associative, 64B cache line size
 
-
-### Experiment Setup:
-
-1. Set the number of processors to 2, 4, 8, and 16.
-2. Run the program with and without false sharing for each configuration.
-3. To observe the impact of false sharing, observe following metrics:
-   - Execution time
-   - Number of invalidations (`ruby_system.L1Cache_Controller.Inv::total`)
-   - Number of loads under different states (`L1Cache_Controller.I.Load::total`, `L1Cache_Controller.S.Load::total`, `L1Cache_Controller.E.Load::total`, `L1Cache_Controller.M.Load::total`)
-   - Number of read and write requests towards the L2 cache (`L2Cache_Controller.L1_GETS`, `L2Cache_Controller.L1_GETX`)
-   - Network traffic ( `network.msg_count.Request_Control`, `network.msg_count.Response_Data`, `network.msg_count.Writeback_Data`)
-
-- Parameters of cache hierarchy:
-  - L1 cache: 32KB, 4-way set associative, 64B cache line size
-  - L2 cache: 256KB, 8-way set associative, 64B cache line size
-  - Number of L2 cache banks: 1
  
 
 ## Assessing the impact of false sharing on performance in directory based cache coherence protocols (4 points)
