@@ -1,4 +1,9 @@
 #!/bin/bash
+#SBATCH --job-name=gem5_simulation
+#SBATCH --output=gem5_log.txt
+#SBATCH --cpus-per-task=16
+#SBATCH --ntasks=1
+#SBATCH --time=04:00:00
 
 GEM5_WORKSPACE=/d/hpc/projects/FRI/GEM5/gem5_workspace
 GEM5_ROOT=$GEM5_WORKSPACE/gem5
@@ -26,9 +31,6 @@ do
             --l1_size=32KiB \
             --l2_size=256KiB \
             --binary="../workload/pi/${PROGRAM}.bin"
-        
-        # Copy stats file to the output directory
-        cp m5out/stats.txt $OUTPUT_DIR/
         
         echo "Completed experiment with $PROGRAM using $NUM_CORES cores."
     done

@@ -78,6 +78,7 @@ class MESITwoLevelCacheHierarchy(
         l2_size: str,
         l2_assoc: str,
         num_l2_banks: int,
+        network: str,
     ):
         AbstractRubyCacheHierarchy.__init__(self=self)
         AbstractTwoLevelCacheHierarchy.__init__(
@@ -91,7 +92,7 @@ class MESITwoLevelCacheHierarchy(
         )
 
         self._num_l2_banks = num_l2_banks
-
+        self._network = network
     @overrides(AbstractCacheHierarchy)
     def get_coherence_protocol(self):
         return CoherenceProtocol.MESI_TWO_LEVEL
@@ -107,7 +108,13 @@ class MESITwoLevelCacheHierarchy(
         self.ruby_system.number_of_virtual_networks = 3
 
         # Create the network 
-        self.ruby_system.network = SimplePt2Pt(self.ruby_system)
+        if self._network == "SimplePt2Pt":
+            self.ruby_system.network = SimplePt2Pt(self.ruby_system)
+        elif self._network == "Circle":
+            self.ruby_system.network = Circle(self.ruby_system)
+        elif self._network == "Crossbar":
+            self.ruby_system.network = Crossbar(self.ruby_system)
+
         self.ruby_system.network.number_of_virtual_networks = 3
 
         # For each core, create an L1 cache and connect it to the core. Also create sequencer for each L1 cache.

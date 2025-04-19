@@ -4,38 +4,31 @@ GEM5_WORKSPACE=/d/hpc/projects/FRI/GEM5/gem5_workspace
 GEM5_ROOT=$GEM5_WORKSPACE/gem5
 GEM_PATH=$GEM5_ROOT/build/X86
 
-# First, make sure the Cholesky binary is built
-# echo "Building Cholesky decomposition binary..."
-# pushd ../workload/cholesky
-# make clean
-# apptainer exec $GEM5_WORKSPACE/gem5.sif make
-# popd
-
 # Directory to store results
 RESULTS_DIR="cholesky_results"
 mkdir -p $RESULTS_DIR
 
 # Run experiments with different core counts
-# echo "Running experiments with different core counts..."
+echo "Running experiments with different core counts..."
 
-# for NUM_CORES in 2 4 8 16
-# do
-#     echo "Running with $NUM_CORES cores..."
-#     OUTPUT_DIR="$RESULTS_DIR/cores_$NUM_CORES"
-#     mkdir -p $OUTPUT_DIR
+for NUM_CORES in 2 4 8 16
+do
+    echo "Running with $NUM_CORES cores..."
+    OUTPUT_DIR="$RESULTS_DIR/cores_$NUM_CORES"
+    mkdir -p $OUTPUT_DIR
     
-#     # Run the simulation with specific number instead of variable
-#     srun apptainer exec $GEM5_WORKSPACE/gem5.sif $GEM_PATH/gem5.opt --outdir=$OUTPUT_DIR smp_benchmark.py \
-#         --num_cores=$NUM_CORES \
-#         --l1_size=32KiB \
-#         --l2_size=256KiB \
-#         --l3_size=2MiB
+    # Run the simulation with specific number instead of variable
+    srun apptainer exec $GEM5_WORKSPACE/gem5.sif $GEM_PATH/gem5.opt --outdir=$OUTPUT_DIR smp_benchmark.py \
+        --num_cores=$NUM_CORES \
+        --l1_size=32KiB \
+        --l2_size=256KiB \
+        --l3_size=2MiB
     
-#     # Copy stats file to the output directory
-#     cp m5out/stats.txt $OUTPUT_DIR/
+    # Copy stats file to the output directory
+    cp m5out/stats.txt $OUTPUT_DIR/
     
-#     echo "Completed experiment with $NUM_CORES cores."
-# done
+    echo "Completed experiment with $NUM_CORES cores."
+done
 
 echo "All experiments completed."
 
